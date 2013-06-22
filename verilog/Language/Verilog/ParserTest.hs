@@ -17,7 +17,7 @@ import Language.Verilog.Syntax      (Verilog)
 --------------------------------------------------------------------------------
 
 examples_dir :: FilePath
-examples_dir = "./verilog/examples"
+examples_dir = "./examples"
 
 check_all :: IO ()
 check_all
