@@ -64,7 +64,9 @@ module Language.Verilog.Syntax.AST
   AssignmentControl(..), DelayControl, EventControl(..), Delay,
   EventExpr(..), ScalarEventExpr,
   ChargeStrength, DriveStrength(..),
-  Strength0(..), Strength1(..), NetType(..)
+  Strength0(..), Strength1(..), NetType(..),
+
+  Keyword, toString
   ) where
 
 import Data.Binary      ( Binary(..), putWord8, getWord8 )
@@ -72,6 +74,9 @@ import Data.Generics    ( Data, Typeable )
 
 import Language.Verilog.Syntax.Ident
 import Language.Verilog.Syntax.Expression
+
+class Keyword a where
+  toString :: a -> String
 
 -- -----------------------------------------------------------------------------
 -- 1. Source Text
@@ -296,35 +301,35 @@ data PrimType
   | Gate_nmos | Gate_rnmos | Gate_pmos | Gate_rpmos | Gate_cmos | Gate_rcmos
   | Gate_tran | Gate_rtran
   | Gate_tranif0 | Gate_rtranif0 | Gate_tranif1 | Gate_rtranif1
-  deriving (Eq, Ord, Bounded, Enum, Data, Typeable)
+  deriving (Eq, Ord, Show, Bounded, Enum, Data, Typeable)
 
-instance Show PrimType where
-  show Gate_and      = "and"
-  show Gate_nand     = "nand"
-  show Gate_or       = "or"
-  show Gate_nor      = "nor"
-  show Gate_xor      = "xor"
-  show Gate_xnor     = "xnor"
-  show Gate_not      = "not"
-  show Gate_buf      = "buf"
-  show Gate_bufif0   = "bufif0"
-  show Gate_bufif1   = "bufif1"
-  show Gate_notif0   = "notif0"
-  show Gate_notify1  = "notify1"
-  show Gate_pulldown = "pulldown"
-  show Gate_pullup   = "pullup"
-  show Gate_nmos     = "nmos"
-  show Gate_rnmos    = "rnmos"
-  show Gate_pmos     = "pmos"
-  show Gate_rpmos    = "rpmos"
-  show Gate_cmos     = "cmos"
-  show Gate_rcmos    = "rcmos"
-  show Gate_tran     = "tran"
-  show Gate_rtran    = "rtran"
-  show Gate_tranif0  = "tranif0"
-  show Gate_rtranif0 = "rtranif0"
-  show Gate_tranif1  = "tranif1"
-  show Gate_rtranif1 = "rtranif1"
+instance Keyword PrimType where
+  toString Gate_and      = "and"
+  toString Gate_nand     = "nand"
+  toString Gate_or       = "or"
+  toString Gate_nor      = "nor"
+  toString Gate_xor      = "xor"
+  toString Gate_xnor     = "xnor"
+  toString Gate_not      = "not"
+  toString Gate_buf      = "buf"
+  toString Gate_bufif0   = "bufif0"
+  toString Gate_bufif1   = "bufif1"
+  toString Gate_notif0   = "notif0"
+  toString Gate_notify1  = "notify1"
+  toString Gate_pulldown = "pulldown"
+  toString Gate_pullup   = "pullup"
+  toString Gate_nmos     = "nmos"
+  toString Gate_rnmos    = "rnmos"
+  toString Gate_pmos     = "pmos"
+  toString Gate_rpmos    = "rpmos"
+  toString Gate_cmos     = "cmos"
+  toString Gate_rcmos    = "rcmos"
+  toString Gate_tran     = "tran"
+  toString Gate_rtran    = "rtran"
+  toString Gate_tranif0  = "tranif0"
+  toString Gate_rtranif0 = "rtranif0"
+  toString Gate_tranif1  = "tranif1"
+  toString Gate_rtranif1 = "rtranif1"
 
 -- --------------------
 -- module and udp instantiations
@@ -436,12 +441,7 @@ type LValue = Expression
 
 data CaseWord
   = Case | Casex | Casez
-  deriving (Eq, Ord, Data, Typeable)
-
-instance Show CaseWord where
-  show Case  = "case"
-  show Casex = "casex"
-  show Casez = "casez"
+  deriving (Eq, Ord, Show, Data, Typeable)
 
 -- | One case item in a @case@ statement.
 data CaseItem
@@ -523,44 +523,44 @@ data DriveStrength
 
 data Strength0
   = Supply0 | Strong0 | Pull0 | Weak0 | Highz0
-  deriving (Eq, Ord, Bounded, Enum, Data, Typeable)
+  deriving (Eq, Ord, Show, Bounded, Enum, Data, Typeable)
 
-instance Show Strength0 where
-  show Supply0 = "supply0"
-  show Strong0 = "strong0"
-  show Pull0   = "pull0"
-  show Weak0   = "weak0"
-  show Highz0  = "highz0"
+instance Keyword Strength0 where
+  toString Supply0 = "supply0"
+  toString Strong0 = "strong0"
+  toString Pull0   = "pull0"
+  toString Weak0   = "weak0"
+  toString Highz0  = "highz0"
 
 data Strength1
   = Supply1 | Strong1 | Pull1 | Weak1 | Highz1
-  deriving (Eq, Ord, Bounded, Enum, Data, Typeable)
+  deriving (Eq, Ord, Show, Bounded, Enum, Data, Typeable)
 
-instance Show Strength1 where
-  show Supply1 = "supply1"
-  show Strong1 = "strong1"
-  show Pull1   = "pull1"
-  show Weak1   = "weak1"
-  show Highz1  = "highz1"
+instance Keyword Strength1 where
+  toString Supply1 = "supply1"
+  toString Strong1 = "strong1"
+  toString Pull1   = "pull1"
+  toString Weak1   = "weak1"
+  toString Highz1  = "highz1"
 
 data NetType
   = Net_wire | Net_tri | Net_tri1 | Net_supply0
   | Net_wand | Net_triand | Net_tri0 | Net_supply1 | Net_wor
   | Net_trior | Net_triref
-  deriving (Eq, Ord, Bounded, Enum, Data, Typeable)
+  deriving (Eq, Ord, Show, Bounded, Enum, Data, Typeable)
 
-instance Show NetType where
-  show Net_wire    = "wire"
-  show Net_tri     = "tri"
-  show Net_tri1    = "tri1"
-  show Net_supply0 = "supply0"
-  show Net_wand    = "wand"
-  show Net_triand  = "triand"
-  show Net_tri0    = "tri0"
-  show Net_supply1 = "supply1"
-  show Net_wor     = "wor"
-  show Net_trior   = "trior"
-  show Net_triref  = "triref"
+instance Keyword NetType where
+  toString Net_wire    = "wire"
+  toString Net_tri     = "tri"
+  toString Net_tri1    = "tri1"
+  toString Net_supply0 = "supply0"
+  toString Net_wand    = "wand"
+  toString Net_triand  = "triand"
+  toString Net_tri0    = "tri0"
+  toString Net_supply1 = "supply1"
+  toString Net_wor     = "wor"
+  toString Net_trior   = "trior"
+  toString Net_triref  = "triref"
 
 data RegType
   = Reg_reg      -- ^ unsigned variable of any size = "
@@ -568,14 +568,14 @@ data RegType
   | Reg_time     -- ^ unsigned 64-bit variable
   | Reg_real     -- ^ double-precision floating point variable
   | Reg_realtime -- ^ (same as above)
-  deriving (Eq, Ord, Bounded, Enum, Data, Typeable)
+  deriving (Eq, Ord, Show, Bounded, Enum, Data, Typeable)
 
-instance Show RegType where
-  show Reg_reg      = "reg"
-  show Reg_integer  = "integer"
-  show Reg_time     = "time"
-  show Reg_real     = "real"
-  show Reg_realtime = "real"
+instance Keyword RegType where
+  toString Reg_reg      = "reg"
+  toString Reg_integer  = "integer"
+  toString Reg_time     = "time"
+  toString Reg_real     = "real"
+  toString Reg_realtime = "real"
 
 -- -----------------------------------------------------------------------------
 -- GENERATED START

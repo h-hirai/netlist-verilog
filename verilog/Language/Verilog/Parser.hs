@@ -921,9 +921,9 @@ reg_type :: Stream s Identity Char => P s RegType
 reg_type = parse_table
 
 -- this can be used for NetType, RegType, Strength0, Strength1, etc.
-parse_table :: (Stream s Identity Char, Show a, Enum a, Bounded a) => P s a
+parse_table :: (Stream s Identity Char, Keyword a, Enum a, Bounded a) => P s a
 parse_table
-  = choice [ reserved (show x) >> return x
+  = choice [ reserved (toString x) >> return x
              | x <- [minBound..maxBound]
            ]
 

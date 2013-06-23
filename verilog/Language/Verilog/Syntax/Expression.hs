@@ -80,11 +80,7 @@ type Expression = Expression' Number
 
 data Sign
   = Pos | Neg
-  deriving (Eq, Ord, Data, Typeable)
-
-instance Show Sign where
-  show Pos = "+"
-  show Neg = "-"
+  deriving (Eq, Ord, Show, Data, Typeable)
 
 intExpr :: (Integral a, Show a) => a -> Expression
 intExpr x = ExprNum (IntNum Nothing Nothing Nothing (show x))
@@ -95,33 +91,10 @@ data Number
   -- | A real number: sign, integral integral, fractional part, exponent sign,
   -- and exponent value
   | RealNum (Maybe Sign) String (Maybe String) (Maybe (Maybe Sign, String))
-  deriving (Eq, Ord, Data, Typeable)
-
-instance Show Number where
-  show (IntNum maybe_sign maybe_size maybe_base value)
-    = maybe "" show maybe_sign ++
-      fromMaybe "" maybe_size ++
-      maybe "" show maybe_base ++
-      value
-
-  show (RealNum maybe_sign int_part maybe_fract_part maybe_exponent)
-    = maybe "" show maybe_sign ++
-      int_part ++
-      maybe "" ("."++) maybe_fract_part ++
-      case maybe_exponent of
-        Just (mb_sign, e) -> "e" ++ (maybe "" show mb_sign) ++ e
-        Nothing           -> ""
+  deriving (Eq, Ord, Show, Data, Typeable)
 
 data Base = BinBase | OctBase | DecBase | HexBase
-  deriving (Eq, Ord, Data, Typeable)
-
-instance Show Base where
-  show x = ['\'', case x of
-                    BinBase -> 'b'
-                    OctBase -> 'o'
-                    DecBase -> 'd'
-                    HexBase -> 'h'
-           ]
+  deriving (Eq, Ord, Show, Data, Typeable)
 
 --------------------------------------------------------------------------------
 -- operators
@@ -142,19 +115,7 @@ data UnaryOp
   | UNor    -- ^ @NOR@ reduction operator: @~|@
   | UXor    -- ^ @XOR@ reduction operator: @^@
   | UXnor   -- ^ @XNOR@ reduction operator: @^~@ or @~^@
-  deriving (Eq, Ord, Data, Typeable)
-
-instance Show UnaryOp where
-  show UPlus  = "+"
-  show UMinus = "-"
-  show UBang  = "!"
-  show UTilde = "~"
-  show UAnd   = "&"
-  show UNand  = "~&"
-  show UOr    = "|"
-  show UNor   = "~|"
-  show UXor   = "^"
-  show UXnor  = "^~" -- "~^" is also valid
+  deriving (Eq, Ord, Show, Data, Typeable)
 
 -- | Binary operators.
 data BinaryOp
@@ -184,33 +145,7 @@ data BinaryOp
   | Xnor         -- ^ Bitwise @XNOR@ operation: @^~@ or @~^@
   | ShiftLeft    -- ^ Logical left shift: @<<@
   | ShiftRight   -- ^ Logical right shift: @>>@
-  deriving (Eq, Ord, Data, Typeable)
-
-instance Show BinaryOp where
-  show Pow          = "**"
-  show Plus         = "+"
-  show Minus        = "-"
-  show Times        = "*"
-  show Divide       = "/"
-  show Modulo       = "%"
-  show Equals       = "=="
-  show NotEquals    = "!="
-  show CEquals      = "==="
-  show CNotEquals   = "!=="
-  show LAnd         = "&&"
-  show LOr          = "||"
-  show LessThan     = "<"
-  show LessEqual    = "<="
-  show GreaterThan  = ">"
-  show GreaterEqual = ">="
-  show And          = "&"
-  show Nand         = "~&"
-  show Or           = "|"
-  show Nor          = "~|"
-  show Xor          = "^"
-  show Xnor         = "^~"
-  show ShiftLeft    = "<<"
-  show ShiftRight   = ">>"
+  deriving (Eq, Ord, Show, Data, Typeable)
 
 --------------------------------------------------------------------------------
 -- GENERATED START

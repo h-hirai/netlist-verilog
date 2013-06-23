@@ -196,12 +196,12 @@ ppInOutDecl (InOutDecl mb_range vars)
 
 ppNetDecl :: NetDecl -> Doc
 ppNetDecl (NetDecl t mb_range mb_delay vars)
-  = text (show t) <+>
+  = text (toString t) <+>
     mb ppExpandRange mb_range <+>
     mb ppDelay mb_delay <+>
     ppIdents vars <> semi
 ppNetDecl (NetDeclAssign t mb_strength mb_range mb_delay assignments)
-  = text (show t) <+>
+  = text (toString t) <+>
     mb ppDriveStrength mb_strength <+>
     mb ppExpandRange mb_range <+>
     mb ppDelay mb_delay <+>
@@ -211,7 +211,7 @@ ppNetDecl (NetDeclAssign t mb_strength mb_range mb_delay assignments)
 
 ppRegDecl :: RegDecl -> Doc
 ppRegDecl (RegDecl reg_type mb_range vars)
-  = text (show reg_type) <+> mb ppRange mb_range <+> ppRegVars vars <> semi
+  = text (toString reg_type) <+> mb ppRange mb_range <+> ppRegVars vars <> semi
 
 ppRegVar :: RegVar -> Doc
 ppRegVar (RegVar x Nothing)
@@ -233,7 +233,7 @@ ppEventDecl (EventDecl vars)
 
 ppPrimitiveInst :: PrimitiveInst -> Doc
 ppPrimitiveInst (PrimitiveInst prim_type strength delay insts)
-  = text (show prim_type) <+> mb ppDriveStrength strength <+>
+  = text (toString prim_type) <+> mb ppDriveStrength strength <+>
     mb ppDelay delay <+> commasep (map ppPrimInst insts) <> semi
 
 ppPrimInst :: PrimInst -> Doc
@@ -312,9 +312,13 @@ ppStatement (IfStmt expr stmt1 stmt2)
       = text "else" `nestStmt` ppStatement s
 
 ppStatement (CaseStmt case_type expr case_items)
-  = text (show case_type) <+> parens (ppExpr expr) $$
+  = text (str case_type) <+> parens (ppExpr expr) $$
     nest 2 (vcat (map ppCaseItem case_items)) $$
     text "endcase"
+  where
+    str Case  = "case"
+    str Casex = "casex"
+    str Casez = "casez"
 ppStatement (ForeverStmt stmt)
   = text "forever" `nestStmt` ppStatement stmt
 ppStatement (RepeatStmt expr stmt)
@@ -404,7 +408,27 @@ ppExpr = ppExpr' 0
 -- precedence-aware expression pretty printer - adds parens when it needs to
 ppExpr' :: Int -> Expression -> Doc
 ppExpr' _ (ExprNum x)
-  = text (show x)
+  = text (strNum x)
+  where
+    strSign Pos = "+"
+    strSign Neg = "-"
+    strBase x = '\'':(case x of
+                         BinBase -> "b"
+                         OctBase -> "o"
+                         DecBase -> "d"
+                         HexBase -> "h")
+    strNum (IntNum maybe_sign maybe_size maybe_base value)
+      = maybe "" strSign maybe_sign ++
+        fromMaybe "" maybe_size ++
+        maybe "" strBase maybe_base ++
+        value
+    strNum (RealNum maybe_sign int_part maybe_fract_part maybe_exponent)
+      = maybe "" strSign maybe_sign ++
+        int_part ++
+        maybe "" ("."++) maybe_fract_part ++
+        case maybe_exponent of
+          Just (mb_sign, e) -> "e" ++ (maybe "" strSign mb_sign) ++ e
+          Nothing           -> ""
 
 ppExpr' _ (ExprVar x)
   = ppIdent x
@@ -559,9 +583,9 @@ ppDriveStrength (Strength10 s1 s0)
   = parens (ppStrength1 s1 <> comma <+> ppStrength0 s0)
 
 ppStrength0 :: Strength0 -> Doc
-ppStrength0 = text . show
+ppStrength0 = text . toString
 
 ppStrength1 :: Strength1 -> Doc
-ppStrength1 = text . show
+ppStrength1 = text . toString
 
 -- -----------------------------------------------------------------------------
